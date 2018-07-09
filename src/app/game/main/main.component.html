@@ -1,3 +1,27 @@
-<p>
-  main works!
-</p>
+
+
+<div class="main">
+  <table>
+      <tr *ngFor="let row of field"> 
+          <td *ngFor="let col of row" (click)="setChecked(col)" [ngClass]="{red:col.active}"></td> 
+          
+          
+      </tr> 
+  </table>
+  <div class="button-row">
+    <button mat-icon-button (click)="playGame()">
+      <mat-icon>play_circle_outline</mat-icon>
+    </button>
+    <button mat-icon-button (click)="clearField()">
+      <mat-icon>pause_circle_outline</mat-icon>
+    </button>
+    <button mat-icon-button (click)="setRandom()">
+      <mat-icon>playlist_add</mat-icon>
+    </button>
+    <mat-slider (click)="setTimeLeft(value)"
+      [min]="minValue"
+      [max]="maxValue"
+      [(ngModel)]="value">
+    </mat-slider>
+  </div>
+</div>
