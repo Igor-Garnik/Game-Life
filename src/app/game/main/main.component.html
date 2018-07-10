@@ -3,9 +3,7 @@
 <div class="main">
   <table>
       <tr *ngFor="let row of field"> 
-          <td *ngFor="let col of row" (click)="setChecked(col)" [ngClass]="{red:col.active}"></td> 
-          
-          
+          <td *ngFor="let col of row" (click)="changeState(col)" [ngClass]="{red:col.isAlive}"></td> 
       </tr> 
   </table>
   <div class="button-row">
@@ -15,13 +13,13 @@
     <button mat-icon-button (click)="clearField()">
       <mat-icon>pause_circle_outline</mat-icon>
     </button>
-    <button mat-icon-button (click)="setRandom()">
+    <button mat-icon-button (click)="setRandomLife(field)">
       <mat-icon>playlist_add</mat-icon>
     </button>
-    <mat-slider (click)="setTimeLeft(value)"
+    <mat-slider (click)="setInterval(value)"
       [min]="minValue"
       [max]="maxValue"
-      [(ngModel)]="value">
+      [(ngModel)]="speed">
     </mat-slider>
   </div>
 </div>

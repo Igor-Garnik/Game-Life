@@ -1,5 +1,6 @@
 import { Component, OnInit, ViewChild, ElementRef } from '@angular/core';
 import { GameService } from '../../service/game.service';
+import { Cell } from './../../models/cell'
 
 
 @Component({
@@ -8,47 +9,49 @@ import { GameService } from '../../service/game.service';
   styleUrls: ['./main.component.css']
 })
 export class MainComponent implements OnInit {
-  value:number;
+  row:number = 40;
+  col:number = 40;
+  speed:number;
   maxValue:number = 10;
   minValue:number = 1
-  field:Array<{}>;
-  checked:boolean = false;
-  interval:any;
-  timeLeft:number = 1000;
+  field:Array<[{}]>;
+  intervalValue:any;
+  interval:number = 1000;
 
   constructor(public gameService: GameService) {
   }
 
-  setChecked(data) {
-    data.active== 0 ? data.active = 1 : data.active = 0;
+  changeState(data) {
+    data.isAlive = !data.isAlive;
   }
 
-  setRandom(): void {
-    this.gameService.setRandomCells(this.field)
+  setRandomLife(field): void {
+    this.gameService.setRandomCells(field)
   }
 
   playGame() {
-  /* setInterval(() => {this.gameService.startLife(this.field)}, this.timeLeft) */
-  this.gameService.startLife(this.field)
-}
+    this.field = [...this.gameService.startLife(this.field)]
+    setInterval(() => {this.gameService.startLife(this.field)}, this.interval)
+  
+  }
 
-
-  setTimeLeft(value: number): void {
-    this.timeLeft = -(value*100-1000)
+  setInterval(speed: number): void {
+    this.interval = -(speed*100-1000)
     if(this.interval) {
-      setTimeout(function() {
-        clearInterval(this.interval);
-      }, 100);
+      clearInterval(this.interval);
     }
-    this.interval = setInterval(() => {this.gameService.startLife(this.field)}, this.timeLeft)
+    this.intervalValue = setInterval(() => {this.gameService.startLife(this.field)}, this.interval)
   }
 
   clearField(){
-    this.field = this.gameService.createLife();
+    if(this.interval) {
+      clearInterval(this.interval);
+    }
+    this.field = [...this.gameService.createLife(this.row, this.col)];
   }
 
   ngOnInit() {
-    this.field = this.gameService.createLife();
+    this.field = this.gameService.createLife(this.row, this.col);
   }
 
 }

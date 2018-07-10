@@ -1,5 +1,5 @@
 import { Injectable } from '@angular/core';
-
+import { Cell } from './../models/cell'
 
 @Injectable({
   providedIn: 'root'
@@ -9,17 +9,16 @@ export class GameService {
   y:number;
   array:Array<any> = [];
   field:any;
-  maxRow:number = 40;
-  maxCol:number = 40;
   neighbors:number;
   grid = []
+
   constructor() { }
 
-  createLife() {
-    for(let i = 0; i < this.maxRow; i++) {
+  createLife(row, col): Array<[{}]> {
+    for(let i = 0; i < row; i++) {
       this.array[i] = [];
-      for(let j = 0; j < this.maxCol; j++ ) {
-        this.array[i][j] = {'active': 0};
+      for(let j = 0; j < col; j++ ) {
+        this.array[i][j] = new Cell(i,j,false)        
       }  
     }
     return this.array;
@@ -28,81 +27,82 @@ export class GameService {
   setRandomCells(field):void {
     field.forEach(row => {
       row.forEach(cell => {
-        cell['active'] = Math.floor(Math.random()*(0 + 2)) + 0;
+        cell['isAlive'] = Math.floor(Math.random()*(0 + 2)) + 0;
       })
     })
   }
 
-  /* startLife(field) {
-    field.forEach((cell, i) => {
-      cell.forEach((field , j) => {
-        this.neighbors = 0
-        if(field[this.checkBottomEdge([i]) - 1][j].active == 1) { this.neighbors++; } //up
-        if(field[i][this.checkRightEdge(j) + 1].active == 1) { this.neighbors++; } //right
-        if(field[this.checkRightEdge(i) + 1][j].active == 1) { this.neighbors++; } //bottom
-        if(field[i][this.checkBottomEdge(j) - 1].active == 1) { this.neighbors++; } //left
-        if(field[this.checkBottomEdge(i) - 1] [this.checkRightEdge(j) + 1].active == 1) { this.neighbors++; }
-        if(field[this.checkRightEdge(i) + 1] [this.checkRightEdge(j) + 1].active == 1) { this.neighbors++; }
-        if(field[this.checkRightEdge(i) + 1] [this.checkBottomEdge(j) - 1].active == 1) { this.neighbors++; }
-        if(field[this.checkBottomEdge(i) - 1] [this.checkBottomEdge(j) - 1].active == 1) { this.neighbors++; }
-        this.grid[i][j] = field[i][j];
-        this.checkCells(field[i][j], this.grid[i][j])
+  startLife(field): Array<[{}]> {
+    let array:Array<[{}]>
+    field.forEach((row) => {
+      array[row] = row
+      row.forEach(Cell => {
+        array[Cell] = Cell;
+        let neighbors = this.getNeighbors(Cell, Cell['x'], Cell['y']);
+        array['isAlive'] = this.checkCellsState(Cell['isAlive']);
       })
     })
-    console.log(this.grid)
-  } */
-
-
-
-  startLife(field) {
-    for(let i = 0; i < field.length; i++) {
-      this.grid[i] =[]
-      for(var j = 0; j < field[i].length; j++ ) {
-        this.neighbors = 0
-        if(field[this.checkBottomEdge([i]) - 1][j].active == 1) { this.neighbors++; } //up
-        if(field[i][this.checkRightEdge(j) + 1].active == 1) { this.neighbors++; } //right
-        if(field[this.checkRightEdge(i) + 1][j].active == 1) { this.neighbors++; } //bottom
-        if(field[i][this.checkBottomEdge(j) - 1].active == 1) { this.neighbors++; } //left
-        if(field[this.checkBottomEdge(i) - 1] [this.checkRightEdge(j) + 1].active == 1) { this.neighbors++; }
-        if(field[this.checkRightEdge(i) + 1] [this.checkRightEdge(j) + 1].active == 1) { this.neighbors++; }
-        if(field[this.checkRightEdge(i) + 1] [this.checkBottomEdge(j) - 1].active == 1) { this.neighbors++; }
-        if(field[this.checkBottomEdge(i) - 1] [this.checkBottomEdge(j) - 1].active == 1) { this.neighbors++; }
-        this.grid[i][j] = field[i][j];
-        field[i][j].active = this.checkCells(field[i][j].active, this.grid[i][j].active)
-      }  
-    }
-    console.log(field)
+    return array
   }
 
-  addNaighbors(field: Array<[{}]>): Number{
-    if(field[this.checkBottomEdge([i]) - 1][j].active == 1) { this.neighbors++; } //up
-    if(field[i][this.checkRightEdge(j) + 1].active == 1) { this.neighbors++; } //right
-    if(field[this.checkRightEdge(i) + 1][j].active == 1) { this.neighbors++; } //bottom
-    if(field[i][this.checkBottomEdge(j) - 1].active == 1) { this.neighbors++; } //left
-    if(field[this.checkBottomEdge(i) - 1] [this.checkRightEdge(j) + 1].active == 1) { this.neighbors++; }
-    if(field[this.checkRightEdge(i) + 1] [this.checkRightEdge(j) + 1].active == 1) { this.neighbors++; }
-    if(field[this.checkRightEdge(i) + 1] [this.checkBottomEdge(j) - 1].active == 1) { this.neighbors++; }
-    if(field[this.checkBottomEdge(i) - 1] [this.checkBottomEdge(j) - 1].active == 1) { this.neighbors++; }
+  getNeighbors(cell: {}, x: number, y: number ): void {
+    this.neighbors = 0
+    if(cell[this.checkXEdge(x) - 1][y].isAlive == 1) { this.neighbors++; }
+    if(cell[x][this.checkYEdge(y) + 1].active == 1) { this.neighbors++; } 
+    if(cell[this.checkYEdge(x) + 1][y].active == 1) { this.neighbors++; } 
+    if(cell[x][this.checkXEdge(y) - 1].active == 1) { this.neighbors++; } 
+    if(cell[this.checkXEdge(x) - 1] [this.checkYEdge(y) + 1].active == 1) { this.neighbors++; }
+    if(cell[this.checkYEdge(x) + 1] [this.checkYEdge(y) + 1].active == 1) { this.neighbors++; }
+    if(cell[this.checkYEdge(x) + 1] [this.checkXEdge(y) - 1].active == 1) { this.neighbors++; }
+    if(cell[this.checkXEdge(x) - 1] [this.checkXEdge(y) - 1].active == 1) { this.neighbors++; }
   }
 
-  checkCells(field, grid) {
-    let state = field;
-    if(state == 0 && this.neighbors > 2) {
-      return 1 
-    } else if(state == 1 && (this.neighbors > 2 || this.neighbors <3)){
-      return 0 
+  checkXEdge(x) {
+    return x == 0 ? 40 : x;
+  }
+
+  checkYEdge(y) {
+    return y == 39 ? -1 : y;
+  }
+  
+  checkCellsState(state: boolean) {
+    if(state == false && this.neighbors > 2) {
+      return true
+    } else if(state == true && (this.neighbors > 2 || this.neighbors <3)){
+      return false 
     } else {
       return state;
     }
   }
 
-  checkBottomEdge(edge: any) {
-    return edge == 0 ? this.maxRow : edge;
+  /* startLife(field) {
+    for(let i = 0; i < field.length; i++) {
+      this.grid[i] =[]
+      for(var j = 0; j < field[i].length; j++ ) {
+        this.neighbors = 0;
+        this.grid[i][j] = field[i][j];
+        if(field[this.checkBottomEdge([i]) - 1][j].active == 1) { this.neighbors++; }
+        if(field[i][this.checkRightEdge(j) + 1].active == 1) { this.neighbors++; } 
+        if(field[this.checkRightEdge(i) + 1][j].active == 1) { this.neighbors++; } 
+        if(field[i][this.checkBottomEdge(j) - 1].active == 1) { this.neighbors++; } 
+        if(field[this.checkBottomEdge(i) - 1] [this.checkRightEdge(j) + 1].active == 1) { this.neighbors++; }
+        if(field[this.checkRightEdge(i) + 1] [this.checkRightEdge(j) + 1].active == 1) { this.neighbors++; }
+        if(field[this.checkRightEdge(i) + 1] [this.checkBottomEdge(j) - 1].active == 1) { this.neighbors++; }
+        if(field[this.checkBottomEdge(i) - 1] [this.checkBottomEdge(j) - 1].active == 1) { this.neighbors++; }
+        this.grid[i][j].active = this.checkCells(field[i][j].active, this.grid[i][j].active)
+      }  
+    }
   }
+ */
+ 
 
-  checkRightEdge(edge: any) {
-    return edge == 39 ? -1 : edge;
-  }
+  
+
+  
+
+
+
+  
 
 
 }
