@@ -32,18 +32,19 @@ export class GameService {
     })
   }
 
-  startLife(field): Array<[{}]> {
-    let array:Array<[{}]>
-    field.forEach((row) => {
-      array[row] = row
-      row.forEach(Cell => {
-        array[Cell] = Cell;
-        let neighbors = this.getNeighbors(Cell, Cell['x'], Cell['y']);
+  startLife(field): Array<[{Cell}]> {
+    let array:Array<[{Cell}]> = [];
+    field.forEach((row, index) => {
+      array[index] = row
+      row.forEach(item, index => {
+        array[index] = item;
+        this.getNeighbors(Cell, Cell['x'], Cell['y'])
         array['isAlive'] = this.checkCellsState(Cell['isAlive']);
       })
     })
     return array
   }
+
 
   getNeighbors(cell: {}, x: number, y: number ): void {
     this.neighbors = 0

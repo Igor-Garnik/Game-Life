@@ -26,21 +26,21 @@ export class MainComponent implements OnInit {
   }
 
   setRandomLife(field): void {
-    this.gameService.setRandomCells(field)
+    this.gameService.setRandomCells(field);
   }
 
   playGame() {
-    this.field = [...this.gameService.startLife(this.field)]
-    setInterval(() => {this.gameService.startLife(this.field)}, this.interval)
+    this.field = [...this.gameService.startLife(this.field)];
+    setInterval(() => {this.gameService.startLife(this.field)}, this.interval);
   
   }
 
   setInterval(speed: number): void {
-    this.interval = -(speed*100-1000)
+    this.interval = -(speed*100-1000);
     if(this.interval) {
       clearInterval(this.interval);
     }
-    this.intervalValue = setInterval(() => {this.gameService.startLife(this.field)}, this.interval)
+    this.intervalValue = setInterval(() => {this.gameService.startLife(this.field)}, this.interval);
   }
 
   clearField(){
