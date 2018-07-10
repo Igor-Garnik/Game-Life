@@ -18,8 +18,7 @@ export class GameService {
     for(let i = 0; i < row; i++) {
       this.array[i] = [];
       for(let j = 0; j < col; j++ ) {
-        this.array[i][j] = new Cell(i,j,false) 
-        console.log(this.array[i][j])       
+        this.array[i][j] = new Cell(i,j,false)     
       }  
     }
     return this.array;
@@ -37,10 +36,11 @@ export class GameService {
     let array:Array<[{Cell}]> = [];
     field.forEach((row, index) => {
       array[index] = row
-      row.forEach(Cell, index => {
-        array[index] = Cell;
-        this.getNeighbors(Cell, Cell['x'], Cell['y'])
-        array['isAlive'] = this.checkCellsState(Cell['isAlive']);
+      row.forEach((cell, index)=> {
+        array[index] = cell;
+        console.log(array)
+        this.getNeighbors(cell, cell['x'], cell['y'])
+        array['isAlive'] = this.checkCellsState(cell['isAlive']);
       })
     })
     return array
