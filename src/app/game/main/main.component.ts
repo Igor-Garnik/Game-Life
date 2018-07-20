@@ -9,57 +9,54 @@ import { Cell } from './../../models/cell'
   styleUrls: ['./main.component.css']
 })
 export class MainComponent implements OnInit {
-  size:number = 50;
-  random:number = 0.5;
-  speed:number;
-  maxValue:number = 10;
-  minValue:number = 1
-  field:Cell[][];
-  intervalValue:any;
-  interval:number = 1000;
+  size: number = 30;
+  random: number = 0.5;
+  speed: number;
+  maxValue: number = 10;
+  minValue: number = 1
+  field: Cell[][];
+  interval;
+  time: number = 1000
+  action: boolean = true;
 
   constructor(public gameService: GameService) {
   }
 
-/*   changeState(data) {
-    data.isAlive = !data.isAlive;
-  } */
-
-  setRandomLife(field): void {
-    this.gameService.setRandomCells(field);
-  }
-
   playGame() {
-    this.field = this.gameService.startLife(this.field);
-    //setInterval(() => {this.gameService.startLife(this.field)}, this.interval);
-  
+    this.action = !this.action;
+    clearInterval(this.interval);
+    this.interval = setInterval(() => { this.updateLife() }, this.time);
   }
 
-  setInterval(speed: number): void {
-    this.interval = -(speed*100-1000);
-    if(this.interval) {
-      clearInterval(this.interval);
-    }
-    this.intervalValue = setInterval(() => {this.gameService.startLife(this.field)}, this.interval);
+  pauseGame() {
+    this.action = !this.action;
+    clearInterval(this.interval);
   }
 
-  clearField(){
-    if(this.interval) {
-      clearInterval(this.interval);
-    }
-    this.field = [...this.gameService.createLife(this.row, this.col)];
+  setEmptyLife() {
+    this.field = this.gameService.createEmptyField(this.size);
+  }
+
+  setRandomLife() {
+    this.field = this.gameService.createRandomField(this.random, this.size);
+  }
+
+  updateLife() {
+    this.gameService.getMustBeChanged(this.field)
+      .forEach(pos => this.toggleLive(pos));
   }
 
   toggleLive(pos: number[]) {
     this.field[pos[0]][pos[1]].isAlive = !this.field[pos[0]][pos[1]].isAlive;
+  }
 
+  setGenerationSpeed(): void {
+    this.time = 1000 - this.speed * 100;
+    this.playGame()
   }
 
   ngOnInit() {
-    //this.field = this.gameService.getRnd2DArray(this.size, this.random);
-    this.field = this.gameService.createEmptyField(this.size);
-    //this.field = this.gameService.createRandomField(0.5, this.size);
-    console.log(this.field)
+    this.setEmptyLife();
   }
 
 }

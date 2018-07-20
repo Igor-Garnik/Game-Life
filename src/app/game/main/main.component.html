@@ -1,25 +1,23 @@
-
-
 <div class="main">
   <table>
-      <tr *ngFor="let row of field; let y = index"> 
-          <td *ngFor="let col of row; let x = index" (click)="toggleLive([y, x])" [ngClass]="{red:col.isAlive}"></td> 
-      </tr> 
+    <tr *ngFor="let row of field; let y = index">
+      <td *ngFor="let col of row; let x = index" (click)="toggleLive([y, x])" [ngClass]="{red:col.isAlive}"></td>
+    </tr>
   </table>
   <div class="button-row">
-    <button mat-icon-button (click)="playGame()">
+    <button mat-icon-button *ngIf="action" (click)="playGame()">
       <mat-icon>play_circle_outline</mat-icon>
     </button>
-    <button mat-icon-button (click)="clearField()">
+    <button mat-icon-button *ngIf="!action" (click)="pauseGame()">
       <mat-icon>pause_circle_outline</mat-icon>
     </button>
-    <button mat-icon-button (click)="setRandomLife(field)">
-      <mat-icon>playlist_add</mat-icon>
+    <button mat-icon-button (click)="setEmptyLife()">
+      <mat-icon>check_box_outline_blank</mat-icon>
     </button>
-    <mat-slider (click)="setInterval(value)"
-      [min]="minValue"
-      [max]="maxValue"
-      [(ngModel)]="speed">
+    <button mat-icon-button (click)="setRandomLife()">
+      <mat-icon>check_box</mat-icon>
+    </button>
+    <mat-slider (change)="setGenerationSpeed()" [min]="minValue" [max]="maxValue" [(ngModel)]="speed">
     </mat-slider>
   </div>
 </div>
