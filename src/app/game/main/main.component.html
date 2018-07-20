@@ -4,7 +4,7 @@
       <td *ngFor="let col of row; let x = index" (click)="toggleLive([y, x])" [ngClass]="{red:col.isAlive}"></td>
     </tr>
   </table>
-  <div class="button-row">
+  <div class="button-group">
     <button mat-icon-button *ngIf="action" (click)="playGame()">
       <mat-icon>play_circle_outline</mat-icon>
     </button>

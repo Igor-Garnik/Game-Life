@@ -9,7 +9,7 @@ import { Cell } from './../../models/cell'
   styleUrls: ['./main.component.css']
 })
 export class MainComponent implements OnInit {
-  size: number = 30;
+  size: number = 50;
   random: number = 0.5;
   speed: number;
   maxValue: number = 10;
@@ -18,12 +18,13 @@ export class MainComponent implements OnInit {
   interval;
   time: number = 1000
   action: boolean = true;
+  ignoreAction: boolean = true;
 
   constructor(public gameService: GameService) {
   }
 
-  playGame() {
-    this.action = !this.action;
+  playGame(ignoreAction?) {
+    if (!ignoreAction) this.action = !this.action;
     clearInterval(this.interval);
     this.interval = setInterval(() => { this.updateLife() }, this.time);
   }
@@ -41,6 +42,11 @@ export class MainComponent implements OnInit {
     this.field = this.gameService.createRandomField(this.random, this.size);
   }
 
+  setGenerationSpeed(): void {
+    this.time = 1000 - this.speed * 100;
+    this.playGame(this.ignoreAction);
+  }
+
   updateLife() {
     this.gameService.getMustBeChanged(this.field)
       .forEach(pos => this.toggleLive(pos));
@@ -48,11 +54,6 @@ export class MainComponent implements OnInit {
 
   toggleLive(pos: number[]) {
     this.field[pos[0]][pos[1]].isAlive = !this.field[pos[0]][pos[1]].isAlive;
-  }
-
-  setGenerationSpeed(): void {
-    this.time = 1000 - this.speed * 100;
-    this.playGame()
   }
 
   ngOnInit() {

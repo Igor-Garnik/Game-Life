@@ -1,8 +1,12 @@
-.main{
-    position: absolute;
-    top: 100px;
-    left:50%;
-    margin-left: -225px;
+
+
+table{
+    margin-top: 2%;
+    margin-left: auto;
+    margin-right: auto;
+}
+
+.button-group{
     text-align: center;
 }
 
