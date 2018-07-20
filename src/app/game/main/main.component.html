@@ -2,8 +2,8 @@
 
 <div class="main">
   <table>
-      <tr *ngFor="let row of field"> 
-          <td *ngFor="let col of row" (click)="changeState(col)" [ngClass]="{red:col.isAlive}"></td> 
+      <tr *ngFor="let row of field; let y = index"> 
+          <td *ngFor="let col of row; let x = index" (click)="toggleLive([y, x])" [ngClass]="{red:col.isAlive}"></td> 
       </tr> 
   </table>
   <div class="button-row">

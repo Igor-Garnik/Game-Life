@@ -8,97 +8,136 @@ export class GameService {
   x:number;
   y:number;
   array:Array<any> = [];
-  field:any;
   neighbors:number;
-  grid = []
+  isAlive:boolean;
+  //arr = [];
 
   constructor() { }
 
-  createLife(row, col): Array<[{}]> {
-    for(let i = 0; i < row; i++) {
-      this.array[i] = [];
-      for(let j = 0; j < col; j++ ) {
-        this.array[i][j] = new Cell(i,j,false)     
-      }  
-    }
-    return this.array;
+  nestedForEach(arr, call) {
+    arr.forEach((row, y) => row.forEach((cell, x) => call(cell, [y, x])));
   }
 
-  setRandomCells(field):void {
-    field.forEach(row => {
-      row.forEach(cell => {
-        cell['isAlive'] = Math.floor(Math.random()*(0 + 2)) + 0;
-      })
-    })
+  fillArray(arr, val, cnt){
+    for(let i = 0; i < cnt; i++) arr.push(val(i));
+    return arr;
   }
+
+  createField(isAlive, size) {
+    return this.fillArray([], () => [], size)
+      .map((arr, y) => this.fillArray(arr, (x) => new Cell(x, y, isAlive()), size));
+  }
+
+  createEmptyField(size) {
+    return this.createField(() => false, size);
+  }
+
+  createRandomField(range, size) {
+    return this.createField(() => Math.random()>range, size);
+  }
+
+  getNeighbors(pos,lifeSize) {
+    const neighbors = []
+    for(let y = pos[0] - 1; y <= pos[0] + 1; y++) {
+      for(let x = pos[1] - 1; x <= pos[1] + 1; x++) {
+        //Исключить текущуу ячейку
+        //перезаписать координаты если они выходят за рамки жизни
+        
+        neighbors.push([y,x]);
+      }
+    }
+    return neighbors;
+  }
+
+  getAliveNeighbors(field, curPos) {
+  this.getNeighbors(curPos, field.length);
+  }
+
+  getChangedOnly(field) {
+    let changedPosArr = [];
+    this.nestedForEach(field, (cell, pos) => {
+      this.getAliveNeighbors(field, pos)
+    });
+
+
+
+
+    return changedPosArr;
+  }
+
+  
+
+
+
+
+
+
 
   startLife(field): Array<[{Cell}]> {
     let array:Array<[{Cell}]> = [];
     field.forEach((row, index) => {
-      array[index] = row
-      row.forEach((cell, index)=> {
-        array[index] = cell;
-        console.log(array)
-        this.getNeighbors(cell, cell['x'], cell['y'])
-        array['isAlive'] = this.checkCellsState(cell['isAlive']);
+      let arr:Array<Cell> = [];
+      row.forEach((cell, i)=> {
+        this.countNeighbors(cell.x, cell.y, field);
+        cell.isAlive = this.checkCellsState(cell.isAlive);
+        array['arr'][i].push(cell);
+        
       })
     })
+    console.log(array);
     return array
   }
 
-
-  getNeighbors(cell: {}, x: number, y: number ): void {
+  countNeighbors(x: number, y: number, field: Array<[{Cell}]>): void {
     this.neighbors = 0
-    if(cell[this.checkXEdge(x) - 1][y].isAlive == 1) { this.neighbors++; }
-    if(cell[x][this.checkYEdge(y) + 1].active == 1) { this.neighbors++; } 
-    if(cell[this.checkYEdge(x) + 1][y].active == 1) { this.neighbors++; } 
-    if(cell[x][this.checkXEdge(y) - 1].active == 1) { this.neighbors++; } 
-    if(cell[this.checkXEdge(x) - 1] [this.checkYEdge(y) + 1].active == 1) { this.neighbors++; }
-    if(cell[this.checkYEdge(x) + 1] [this.checkYEdge(y) + 1].active == 1) { this.neighbors++; }
-    if(cell[this.checkYEdge(x) + 1] [this.checkXEdge(y) - 1].active == 1) { this.neighbors++; }
-    if(cell[this.checkXEdge(x) - 1] [this.checkXEdge(y) - 1].active == 1) { this.neighbors++; }
+    if(x = (this.checkXEdge(x) - 1), y, this.findCell(x, y, field), this.isAlive == true) { this.neighbors++; }
+    if(x, y = (this.checkYEdge(y) + 1), this.findCell(x, y, field), this.isAlive == true) { this.neighbors++; } 
+    if(x = (this.checkYEdge(x) + 1), y, this.findCell(x, y, field), this.isAlive == true) { this.neighbors++; } 
+    if(x, y = (this.checkXEdge(y) - 1), this.findCell(x, y, field), this.isAlive == true) { this.neighbors++; } 
+    if(x = (this.checkXEdge(x) - 1), y = (this.checkYEdge(y) + 1), this.findCell(x, y, field), this.isAlive == true) { this.neighbors++; }
+    if(x = (this.checkYEdge(x) + 1), y = (this.checkYEdge(y) + 1), this.findCell(x, y, field), this.isAlive == true) { this.neighbors++; }
+    if(x = (this.checkYEdge(x) + 1), y = (this.checkXEdge(y) - 1), this.findCell(x, y, field), this.isAlive == true) { this.neighbors++; }
+    if(x = (this.checkXEdge(x) - 1), y = (this.checkXEdge(y) - 1), this.findCell(x, y, field), this.isAlive == true) { this.neighbors++; }
   }
 
-  checkXEdge(x) {
+  checkXEdge(x): number {
     return x == 0 ? 40 : x;
   }
 
-  checkYEdge(y) {
+  checkYEdge(y): number {
     return y == 39 ? -1 : y;
   }
+
+  findCell(x: number, y: number, field: Array<[{Cell}]> ): void {
+    field.forEach(row => {
+      row.forEach(cell => {
+        if(cell.x == x && cell.y == y) {
+          this.isAlive = cell.isAlive ? true : false;
+        }
+      })
+    })
+  }
   
-  checkCellsState(state: boolean) {
+  checkCellsState(state: boolean): boolean {
     if(state == false && this.neighbors > 2) {
       return true
-    } else if(state == true && (this.neighbors > 2 || this.neighbors <3)){
+    } else if(state == true && (this.neighbors > 2 || this.neighbors < 4)){
       return false 
     } else {
       return state;
     }
   }
 
-  /* startLife(field) {
-    for(let i = 0; i < field.length; i++) {
-      this.grid[i] =[]
-      for(var j = 0; j < field[i].length; j++ ) {
-        this.neighbors = 0;
-        this.grid[i][j] = field[i][j];
-        if(field[this.checkBottomEdge([i]) - 1][j].active == 1) { this.neighbors++; }
-        if(field[i][this.checkRightEdge(j) + 1].active == 1) { this.neighbors++; } 
-        if(field[this.checkRightEdge(i) + 1][j].active == 1) { this.neighbors++; } 
-        if(field[i][this.checkBottomEdge(j) - 1].active == 1) { this.neighbors++; } 
-        if(field[this.checkBottomEdge(i) - 1] [this.checkRightEdge(j) + 1].active == 1) { this.neighbors++; }
-        if(field[this.checkRightEdge(i) + 1] [this.checkRightEdge(j) + 1].active == 1) { this.neighbors++; }
-        if(field[this.checkRightEdge(i) + 1] [this.checkBottomEdge(j) - 1].active == 1) { this.neighbors++; }
-        if(field[this.checkBottomEdge(i) - 1] [this.checkBottomEdge(j) - 1].active == 1) { this.neighbors++; }
-        this.grid[i][j].active = this.checkCells(field[i][j].active, this.grid[i][j].active)
-      }  
-    }
-  }
- */
- 
+  function fill2Darray(callable, size){
+    const fn = (arr, val, cnt) => arr.length < cnt ?  (arr.push(val()), fn(arr, val, cnt)) : arr;
+    return fn([], () => [], size).map( arr => fn(arr, callable, size));
+}
 
-  
+function getRnd2DArray(size, range=0.5){
+    return fill2Darray( ()=>Math.random()>range , size);
+}
+
+console.log(getRnd2DArray(10));
 
   
 

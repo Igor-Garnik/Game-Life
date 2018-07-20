@@ -9,29 +9,29 @@ import { Cell } from './../../models/cell'
   styleUrls: ['./main.component.css']
 })
 export class MainComponent implements OnInit {
-  row:number = 40;
-  col:number = 40;
+  size:number = 50;
+  random:number = 0.5;
   speed:number;
   maxValue:number = 10;
   minValue:number = 1
-  field:Array<[{}]>;
+  field:Cell[][];
   intervalValue:any;
   interval:number = 1000;
 
   constructor(public gameService: GameService) {
   }
 
-  changeState(data) {
+/*   changeState(data) {
     data.isAlive = !data.isAlive;
-  }
+  } */
 
   setRandomLife(field): void {
     this.gameService.setRandomCells(field);
   }
 
   playGame() {
-    this.field = [...this.gameService.startLife(this.field)];
-    setInterval(() => {this.gameService.startLife(this.field)}, this.interval);
+    this.field = this.gameService.startLife(this.field);
+    //setInterval(() => {this.gameService.startLife(this.field)}, this.interval);
   
   }
 
@@ -50,8 +50,16 @@ export class MainComponent implements OnInit {
     this.field = [...this.gameService.createLife(this.row, this.col)];
   }
 
+  toggleLive(pos: number[]) {
+    this.field[pos[0]][pos[1]].isAlive = !this.field[pos[0]][pos[1]].isAlive;
+
+  }
+
   ngOnInit() {
-    this.field = this.gameService.createLife(this.row, this.col);
+    //this.field = this.gameService.getRnd2DArray(this.size, this.random);
+    this.field = this.gameService.createEmptyField(this.size);
+    //this.field = this.gameService.createRandomField(0.5, this.size);
+    console.log(this.field)
   }
 
 }
